@@ -1,9 +1,9 @@
 # GENERATED! DO NOT MANUALLY EDIT THIS FILE.
 #
-# (1) Edit turbo/copts/copts.py.
-# (2) Run `python <path_to_turbo>/copts/generate_copts.py`.
+# (1) Edit rigel/copts/copts.py.
+# (2) Run `python <path_to_rigel>/copts/generate_copts.py`.
 
-list(APPEND TURBO_CLANG_CL_FLAGS
+list(APPEND RIGEL_CLANG_CL_FLAGS
     "/W3"
     "/DNOMINMAX"
     "/DWIN32_LEAN_AND_MEAN"
@@ -12,7 +12,7 @@ list(APPEND TURBO_CLANG_CL_FLAGS
     "/D_ENABLE_EXTENDED_ALIGNED_STORAGE"
 )
 
-list(APPEND TURBO_CLANG_CL_TEST_FLAGS
+list(APPEND RIGEL_CLANG_CL_TEST_FLAGS
     "/W3"
     "/DNOMINMAX"
     "/DWIN32_LEAN_AND_MEAN"
@@ -37,7 +37,7 @@ list(APPEND TURBO_CLANG_CL_TEST_FLAGS
     "-Wno-gnu-zero-variadic-macro-arguments"
 )
 
-list(APPEND TURBO_GCC_FLAGS
+list(APPEND RIGEL_GCC_FLAGS
     "-Wall"
     "-Wextra"
     "-Wcast-qual"
@@ -55,7 +55,7 @@ list(APPEND TURBO_GCC_FLAGS
     "-DNOMINMAX"
 )
 
-list(APPEND TURBO_GCC_TEST_FLAGS
+list(APPEND RIGEL_GCC_TEST_FLAGS
     "-Wall"
     "-Wextra"
     "-Wcast-qual"
@@ -80,7 +80,7 @@ list(APPEND TURBO_GCC_TEST_FLAGS
     "-Wno-noexcept-type"
 )
 
-list(APPEND TURBO_LLVM_FLAGS
+list(APPEND RIGEL_LLVM_FLAGS
     "-Wall"
     "-Wextra"
     "-Wcast-qual"
@@ -118,7 +118,7 @@ list(APPEND TURBO_LLVM_FLAGS
     "-DNOMINMAX"
 )
 
-list(APPEND TURBO_LLVM_TEST_FLAGS
+list(APPEND RIGEL_LLVM_TEST_FLAGS
     "-Wall"
     "-Wextra"
     "-Wcast-qual"
@@ -170,7 +170,7 @@ list(APPEND TURBO_LLVM_TEST_FLAGS
     "-Wno-gnu-zero-variadic-macro-arguments"
 )
 
-list(APPEND TURBO_MSVC_FLAGS
+list(APPEND RIGEL_MSVC_FLAGS
     "/W3"
     "/bigobj"
     "/wd4005"
@@ -187,11 +187,11 @@ list(APPEND TURBO_MSVC_FLAGS
     "/D_ENABLE_EXTENDED_ALIGNED_STORAGE"
 )
 
-list(APPEND TURBO_MSVC_LINKOPTS
+list(APPEND RIGEL_MSVC_LINKOPTS
     "-ignore:4221"
 )
 
-list(APPEND TURBO_MSVC_TEST_FLAGS
+list(APPEND RIGEL_MSVC_TEST_FLAGS
     "/W3"
     "/bigobj"
     "/wd4005"
@@ -213,18 +213,18 @@ list(APPEND TURBO_MSVC_TEST_FLAGS
     "/DNOMINMAX"
 )
 
-list(APPEND TURBO_RANDOM_HWAES_ARM32_FLAGS
+list(APPEND RIGEL_RANDOM_HWAES_ARM32_FLAGS
     "-mfpu=neon"
 )
 
-list(APPEND TURBO_RANDOM_HWAES_ARM64_FLAGS
+list(APPEND RIGEL_RANDOM_HWAES_ARM64_FLAGS
     "-march=armv8-a+crypto"
 )
 
-list(APPEND TURBO_RANDOM_HWAES_MSVC_X64_FLAGS
+list(APPEND RIGEL_RANDOM_HWAES_MSVC_X64_FLAGS
 )
 
-list(APPEND TURBO_RANDOM_HWAES_X64_FLAGS
+list(APPEND RIGEL_RANDOM_HWAES_X64_FLAGS
     "-maes"
     "-msse4.1"
 )

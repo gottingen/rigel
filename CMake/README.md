@@ -22,7 +22,7 @@ googletest framework
 1. If you want to build the Turbo tests, integrate the Turbo dependency
 [Google Test](https://github.com/google/googletest) into your CMake
 project. To disable Turbo tests, you have to pass either
-`-DBUILD_TESTING=OFF` or `-DTURBO_BUILD_TESTING=OFF` when configuring your
+`-DBUILD_TESTING=OFF` or `-DRIGEL_BUILD_TESTING=OFF` when configuring your
 project with CMake.
 
 2. Download Turbo and copy it into a subdirectory in your CMake project or add
@@ -33,7 +33,7 @@ CMake project.
 [`add_subdirectory()`](https://cmake.org/cmake/help/latest/command/add_subdirectory.html)
 to include Turbo directly in your CMake project.
 
-4. Add the **turbo::** target you wish to use to the
+4. Add the **rigel::** target you wish to use to the
 [`target_link_libraries()`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
 section of your executable or of your library.<br>
 Here is a short CMakeLists.txt example of an application project using Turbo.
@@ -50,7 +50,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(abseil-cpp)
 
 add_executable(my_exe source.cpp)
-target_link_libraries(my_exe turbo::base turbo::synchronization turbo::strings)
+target_link_libraries(my_exe rigel::base rigel::synchronization rigel::strings)
 ```
 
 Note that if you are developing a library designed for use by other clients, you
@@ -75,7 +75,7 @@ endif()
 add_subdirectory(abseil-cpp)
 
 add_library(my_lib source.cpp)
-target_link_libraries(my_lib turbo::base turbo::synchronization turbo::strings)
+target_link_libraries(my_lib rigel::base rigel::synchronization rigel::strings)
 
 # Enforce that my_lib requires C++17. Important to document for clients that they
 # must set CMAKE_CXX_STANDARD to 17 or higher for proper Turbo ABI compatibility
@@ -93,13 +93,13 @@ setting a consistent `CMAKE_CXX_STANDARD` that is sufficiently high.
 
 ### Running Turbo Tests with CMake
 
-Use the `-DTURBO_BUILD_TESTING=ON` flag to run Turbo tests.  Note that
+Use the `-DRIGEL_BUILD_TESTING=ON` flag to run Turbo tests.  Note that
 BUILD_TESTING must also be on (the default).
 
 You will need to provide Turbo with a Googletest dependency.  There are two
 options for how to do this:
 
-* Use `-DTURBO_USE_GOOGLETEST_HEAD`.  This will automatically download the latest
+* Use `-DRIGEL_USE_GOOGLETEST_HEAD`.  This will automatically download the latest
 Googletest source into the build directory at configure time.  Googletest will
 then be compiled directly alongside Turbo's tests.
 * Manually integrate Googletest with your build.  See
@@ -112,7 +112,7 @@ For example, to run just the Turbo tests, you could use this script:
 cd path/to/abseil-cpp
 mkdir build
 cd build
-cmake -DTURBO_BUILD_TESTING=ON -DTURBO_USE_GOOGLETEST_HEAD=ON ..
+cmake -DRIGEL_BUILD_TESTING=ON -DRIGEL_USE_GOOGLETEST_HEAD=ON ..
 make -j
 ctest
 ```
@@ -127,19 +127,19 @@ https://github.com/abseil/abseil-cpp/issues/109 for more information.
 Here's a non-exhaustive list of Turbo CMake public targets:
 
 ```cmake
-turbo::algorithm
-turbo::base
-turbo::debugging
-turbo::flat_hash_map
-turbo::flags
-turbo::memory
-turbo::meta
-turbo::numeric
-turbo::random_random
-turbo::strings
-turbo::synchronization
-turbo::time
-turbo::utility
+rigel::algorithm
+rigel::base
+rigel::debugging
+rigel::flat_hash_map
+rigel::flags
+rigel::memory
+rigel::meta
+rigel::numeric
+rigel::random_random
+rigel::strings
+rigel::synchronization
+rigel::time
+rigel::utility
 ```
 
 ## Traditional CMake Set-Up
@@ -152,9 +152,9 @@ cmake -S /source/googletest -B /build/googletest -DCMAKE_BUILD_TYPE=Release -DCM
 cmake --build /build/googletest --target install
 ```
 
-Then you need to configure and build Turbo. Make sure you enable `TURBO_USE_EXTERNAL_GOOGLETEST` and `TURBO_FIND_GOOGLETEST`. You also need to enable `TURBO_ENABLE_INSTALL` so that you can install Turbo itself.
+Then you need to configure and build Turbo. Make sure you enable `RIGEL_USE_EXTERNAL_GOOGLETEST` and `RIGEL_FIND_GOOGLETEST`. You also need to enable `RIGEL_ENABLE_INSTALL` so that you can install Turbo itself.
 ```
-cmake -S /source/abseil-cpp -B /build/abseil-cpp -DCMAKE_PREFIX_PATH=/installation/dir -DCMAKE_INSTALL_PREFIX=/installation/dir -DTURBO_ENABLE_INSTALL=ON -DTURBO_USE_EXTERNAL_GOOGLETEST=ON -DTURBO_FIND_GOOGLETEST=ON
+cmake -S /source/abseil-cpp -B /build/abseil-cpp -DCMAKE_PREFIX_PATH=/installation/dir -DCMAKE_INSTALL_PREFIX=/installation/dir -DRIGEL_ENABLE_INSTALL=ON -DRIGEL_USE_EXTERNAL_GOOGLETEST=ON -DRIGEL_FIND_GOOGLETEST=ON
 cmake --build /temporary/build/abseil-cpp
 ```
 
@@ -174,15 +174,15 @@ cmake --build /temporary/build/abseil-cpp --target install
 
 ## Enable Standard CMake Installation
 
-`-DTURBO_ENABLE_INSTALL=ON`
+`-DRIGEL_ENABLE_INSTALL=ON`
 
 ## Google Test Options
 
-`-DTURBO_BUILD_TESTING=ON` must be set to enable testing
+`-DRIGEL_BUILD_TESTING=ON` must be set to enable testing
 
-- Have Turbo download and build Google Test for you: `-DTURBO_USE_EXTERNAL_GOOGLETEST=OFF` (default)
-  - Download and build latest Google Test: `-DTURBO_USE_GOOGLETEST_HEAD=ON`
-  - Download specific Google Test version (ZIP archive): `-DTURBO_GOOGLETEST_DOWNLOAD_URL=https://.../version.zip`
-  - Use Google Test from specific local directory: `-DTURBO_LOCAL_GOOGLETEST_DIR=/path/to/googletest`
-- Use Google Test included elsewhere in your project: `-DTURBO_USE_EXTERNAL_GOOGLETEST=ON`
-- Use standard CMake `find_package(CTest)` to find installed Google Test: `-DTURBO_USE_EXTERNAL_GOOGLETEST=ON -DTURBO_FIND_GOOGLETEST=ON`
+- Have Turbo download and build Google Test for you: `-DRIGEL_USE_EXTERNAL_GOOGLETEST=OFF` (default)
+  - Download and build latest Google Test: `-DRIGEL_USE_GOOGLETEST_HEAD=ON`
+  - Download specific Google Test version (ZIP archive): `-DRIGEL_GOOGLETEST_DOWNLOAD_URL=https://.../version.zip`
+  - Use Google Test from specific local directory: `-DRIGEL_LOCAL_GOOGLETEST_DIR=/path/to/googletest`
+- Use Google Test included elsewhere in your project: `-DRIGEL_USE_EXTERNAL_GOOGLETEST=ON`
+- Use standard CMake `find_package(CTest)` to find installed Google Test: `-DRIGEL_USE_EXTERNAL_GOOGLETEST=ON -DRIGEL_FIND_GOOGLETEST=ON`

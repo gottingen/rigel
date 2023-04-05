@@ -16,10 +16,10 @@
 # A simple CMakeLists.txt for testing cmake installation
 
 cmake_minimum_required(VERSION 3.10)
-project(turbo_cmake_testing CXX)
+project(rigel_cmake_testing CXX)
 
 add_executable(simple simple.cc)
 
-find_package(turbo REQUIRED)
+find_package(rigel REQUIRED)
 
-target_link_libraries(simple turbo::strings turbo::config)
+target_link_libraries(simple rigel::strings rigel::config)

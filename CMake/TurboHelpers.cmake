@@ -22,17 +22,17 @@ include(TurboDll)
 # project that sets
 #    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # For example, Visual Studio supports folders.
-if(NOT DEFINED TURBO_IDE_FOLDER)
-  set(TURBO_IDE_FOLDER Turbo)
+if(NOT DEFINED RIGEL_IDE_FOLDER)
+  set(RIGEL_IDE_FOLDER Turbo)
 endif()
 
-if(TURBO_USE_SYSTEM_INCLUDES)
-  set(TURBO_INTERNAL_INCLUDE_WARNING_GUARD SYSTEM)
+if(RIGEL_USE_SYSTEM_INCLUDES)
+  set(RIGEL_INTERNAL_INCLUDE_WARNING_GUARD SYSTEM)
 else()
-  set(TURBO_INTERNAL_INCLUDE_WARNING_GUARD "")
+  set(RIGEL_INTERNAL_INCLUDE_WARNING_GUARD "")
 endif()
 
-# turbo_cc_library()
+# rigel_cc_library()
 #
 # CMake function to imitate Bazel's cc_library rule.
 #
@@ -47,14 +47,14 @@ endif()
 # PUBLIC: Add this so that this library will be exported under rigel::
 # Also in IDE, target will appear in Turbo folder while non PUBLIC will be in Turbo/internal.
 # TESTONLY: When added, this target will only be built if both
-#           BUILD_TESTING=ON and TURBO_BUILD_TESTING=ON.
+#           BUILD_TESTING=ON and RIGEL_BUILD_TESTING=ON.
 #
 # Note:
-# By default, turbo_cc_library will always create a library named ${NAME},
+# By default, rigel_cc_library will always create a library named ${NAME},
 # and alias target rigel::${NAME}.  The rigel:: form should always be used.
 # This is to reduce namespace pollution.
 #
-# turbo_cc_library(
+# rigel_cc_library(
 #   NAME
 #     awesome
 #   HDRS
@@ -62,7 +62,7 @@ endif()
 #   SRCS
 #     "a.cc"
 # )
-# turbo_cc_library(
+# rigel_cc_library(
 #   NAME
 #     fantastic_lib
 #   SRCS
@@ -72,7 +72,7 @@ endif()
 #   PUBLIC
 # )
 #
-# turbo_cc_library(
+# rigel_cc_library(
 #   NAME
 #     main_lib
 #   ...
@@ -81,41 +81,41 @@ endif()
 # )
 #
 # TODO: Implement "ALWAYSLINK"
-function(turbo_cc_library)
-  cmake_parse_arguments(TURBO_CC_LIB
+function(rigel_cc_library)
+  cmake_parse_arguments(RIGEL_CC_LIB
     "DISABLE_INSTALL;PUBLIC;TESTONLY"
     "NAME"
     "HDRS;SRCS;COPTS;DEFINES;LINKOPTS;DEPS"
     ${ARGN}
   )
 
-  if(TURBO_CC_LIB_TESTONLY AND
-      NOT ((BUILD_TESTING AND TURBO_BUILD_TESTING) OR
-        (TURBO_BUILD_TEST_HELPERS AND TURBO_CC_LIB_PUBLIC)))
+  if(RIGEL_CC_LIB_TESTONLY AND
+      NOT ((BUILD_TESTING AND RIGEL_BUILD_TESTING) OR
+        (RIGEL_BUILD_TEST_HELPERS AND RIGEL_CC_LIB_PUBLIC)))
     return()
   endif()
 
-  if(TURBO_ENABLE_INSTALL)
-    set(_NAME "${TURBO_CC_LIB_NAME}")
+  if(RIGEL_ENABLE_INSTALL)
+    set(_NAME "${RIGEL_CC_LIB_NAME}")
   else()
-    set(_NAME "${TURBO_CC_LIB_NAME}")
+    set(_NAME "${RIGEL_CC_LIB_NAME}")
   endif()
 
   # Check if this is a header-only library
   # Note that as of February 2019, many popular OS's (for example, Ubuntu
   # 16.04 LTS) only come with cmake 3.5 by default.  For this reason, we can't
   # use list(FILTER...)
-  set(TURBO_CC_SRCS "${TURBO_CC_LIB_SRCS}")
-  foreach(src_file IN LISTS TURBO_CC_SRCS)
+  set(RIGEL_CC_SRCS "${RIGEL_CC_LIB_SRCS}")
+  foreach(src_file IN LISTS RIGEL_CC_SRCS)
     if(${src_file} MATCHES ".*\\.(h|inc)")
-      list(REMOVE_ITEM TURBO_CC_SRCS "${src_file}")
+      list(REMOVE_ITEM RIGEL_CC_SRCS "${src_file}")
     endif()
   endforeach()
 
-  if(TURBO_CC_SRCS STREQUAL "")
-    set(TURBO_CC_LIB_IS_INTERFACE 1)
+  if(RIGEL_CC_SRCS STREQUAL "")
+    set(RIGEL_CC_LIB_IS_INTERFACE 1)
   else()
-    set(TURBO_CC_LIB_IS_INTERFACE 0)
+    set(RIGEL_CC_LIB_IS_INTERFACE 0)
   endif()
 
   # Determine this build target's relationship to the DLL. It's one of four things:
@@ -129,16 +129,16 @@ function(turbo_cc_library)
   #                 where DLL doesn't make sense.
   # 4. "static"  -- This target does not depend on the DLL and should be built
   #                 statically.
-  if (${TURBO_BUILD_DLL})
-    if(TURBO_ENABLE_INSTALL)
-      turbo_internal_dll_contains(TARGET ${_NAME} OUTPUT _in_dll)
+  if (${RIGEL_BUILD_DLL})
+    if(RIGEL_ENABLE_INSTALL)
+      rigel_internal_dll_contains(TARGET ${_NAME} OUTPUT _in_dll)
     else()
-      turbo_internal_dll_contains(TARGET ${TURBO_CC_LIB_NAME} OUTPUT _in_dll)
+      rigel_internal_dll_contains(TARGET ${RIGEL_CC_LIB_NAME} OUTPUT _in_dll)
     endif()
     if (${_in_dll})
       # This target should be replaced by the DLL
       set(_build_type "dll")
-      set(TURBO_CC_LIB_IS_INTERFACE 1)
+      set(RIGEL_CC_LIB_IS_INTERFACE 1)
     else()
       # Building a DLL, but this target is not part of the DLL
       set(_build_type "dll_dep")
@@ -150,27 +150,27 @@ function(turbo_cc_library)
   endif()
 
   # Generate a pkg-config file for every library:
-  if(TURBO_ENABLE_INSTALL)
-    if(NOT TURBO_CC_LIB_TESTONLY)
-      if(turbo_VERSION)
-        set(PC_VERSION "${turbo_VERSION}")
+  if(RIGEL_ENABLE_INSTALL)
+    if(NOT RIGEL_CC_LIB_TESTONLY)
+      if(rigel_VERSION)
+        set(PC_VERSION "${rigel_VERSION}")
       else()
         set(PC_VERSION "head")
       endif()
-      foreach(dep ${TURBO_CC_LIB_DEPS})
+      foreach(dep ${RIGEL_CC_LIB_DEPS})
         if(${dep} MATCHES "^rigel::(.*)")
           # for DLL builds many libs are not created, but add
           # the pkgconfigs nevertheless, pointing to the dll.
           if(_build_type STREQUAL "dll")
             # hide this MATCHES in an if-clause so it doesn't overwrite
             # the CMAKE_MATCH_1 from (${dep} MATCHES "^rigel::(.*)")
-            if(NOT PC_DEPS MATCHES "turbo_dll")
+            if(NOT PC_DEPS MATCHES "rigel_dll")
               # Join deps with commas.
               if(PC_DEPS)
                 set(PC_DEPS "${PC_DEPS},")
               endif()
               # don't duplicate dll-dep if it exists already
-              set(PC_DEPS "${PC_DEPS} turbo_dll = ${PC_VERSION}")
+              set(PC_DEPS "${PC_DEPS} rigel_dll = ${PC_VERSION}")
               set(LNK_LIB "${LNK_LIB} -labseil_dll")
             endif()
           else()
@@ -183,7 +183,7 @@ function(turbo_cc_library)
           endif()
         endif()
       endforeach()
-      foreach(cflag ${TURBO_CC_LIB_COPTS})
+      foreach(cflag ${RIGEL_CC_LIB_COPTS})
         if(${cflag} MATCHES "^(-Wno|/wd)")
           # These flags are needed to suppress warnings that might fire in our headers.
           set(PC_CFLAGS "${PC_CFLAGS} ${cflag}")
@@ -196,7 +196,7 @@ function(turbo_cc_library)
           set(PC_CFLAGS "${PC_CFLAGS} ${cflag}")
         endif()
       endforeach()
-      string(REPLACE ";" " " PC_LINKOPTS "${TURBO_CC_LIB_LINKOPTS}")
+      string(REPLACE ";" " " PC_LINKOPTS "${RIGEL_CC_LIB_LINKOPTS}")
       FILE(GENERATE OUTPUT "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc" CONTENT "\
 prefix=${CMAKE_INSTALL_PREFIX}\n\
 exec_prefix=\${prefix}\n\
@@ -208,32 +208,32 @@ Description: Turbo ${_NAME} library\n\
 URL: https://abseil.io/\n\
 Version: ${PC_VERSION}\n\
 Requires:${PC_DEPS}\n\
-Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${TURBO_CC_LIB_IS_INTERFACE}>>:${LNK_LIB}>\n\
+Libs: -L\${libdir} ${PC_LINKOPTS} $<$<NOT:$<BOOL:${RIGEL_CC_LIB_IS_INTERFACE}>>:${LNK_LIB}>\n\
 Cflags: -I\${includedir}${PC_CFLAGS}\n")
       INSTALL(FILES "${CMAKE_BINARY_DIR}/lib/pkgconfig/${_NAME}.pc"
               DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig")
     endif()
   endif()
 
-  if(NOT TURBO_CC_LIB_IS_INTERFACE)
+  if(NOT RIGEL_CC_LIB_IS_INTERFACE)
     if(_build_type STREQUAL "dll_dep")
       # This target depends on the DLL. When adding dependencies to this target,
       # any depended-on-target which is contained inside the DLL is replaced
       # with a dependency on the DLL.
       add_library(${_NAME} STATIC "")
-      target_sources(${_NAME} PRIVATE ${TURBO_CC_LIB_SRCS} ${TURBO_CC_LIB_HDRS})
-      turbo_internal_dll_targets(
-        DEPS ${TURBO_CC_LIB_DEPS}
+      target_sources(${_NAME} PRIVATE ${RIGEL_CC_LIB_SRCS} ${RIGEL_CC_LIB_HDRS})
+      rigel_internal_dll_targets(
+        DEPS ${RIGEL_CC_LIB_DEPS}
         OUTPUT _dll_deps
       )
       target_link_libraries(${_NAME}
         PUBLIC ${_dll_deps}
         PRIVATE
-          ${TURBO_CC_LIB_LINKOPTS}
-          ${TURBO_DEFAULT_LINKOPTS}
+          ${RIGEL_CC_LIB_LINKOPTS}
+          ${RIGEL_DEFAULT_LINKOPTS}
       )
 
-      if (TURBO_CC_LIB_TESTONLY)
+      if (RIGEL_CC_LIB_TESTONLY)
         set(_gtest_link_define "GTEST_LINKED_AS_SHARED_LIBRARY=1")
       else()
         set(_gtest_link_define)
@@ -241,18 +241,18 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
 
       target_compile_definitions(${_NAME}
         PUBLIC
-          TURBO_CONSUME_DLL
+          RIGEL_CONSUME_DLL
           "${_gtest_link_define}"
       )
 
     elseif(_build_type STREQUAL "static" OR _build_type STREQUAL "shared")
       add_library(${_NAME} "")
-      target_sources(${_NAME} PRIVATE ${TURBO_CC_LIB_SRCS} ${TURBO_CC_LIB_HDRS})
+      target_sources(${_NAME} PRIVATE ${RIGEL_CC_LIB_SRCS} ${RIGEL_CC_LIB_HDRS})
       target_link_libraries(${_NAME}
-      PUBLIC ${TURBO_CC_LIB_DEPS}
+      PUBLIC ${RIGEL_CC_LIB_DEPS}
       PRIVATE
-        ${TURBO_CC_LIB_LINKOPTS}
-        ${TURBO_DEFAULT_LINKOPTS}
+        ${RIGEL_CC_LIB_LINKOPTS}
+        ${RIGEL_DEFAULT_LINKOPTS}
       )
     else()
       message(FATAL_ERROR "Invalid build type: ${_build_type}")
@@ -265,35 +265,35 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     # unconditionally.
     set_property(TARGET ${_NAME} PROPERTY LINKER_LANGUAGE "CXX")
 
-    target_include_directories(${_NAME} ${TURBO_INTERNAL_INCLUDE_WARNING_GUARD}
+    target_include_directories(${_NAME} ${RIGEL_INTERNAL_INCLUDE_WARNING_GUARD}
       PUBLIC
-        "$<BUILD_INTERFACE:${TURBO_COMMON_INCLUDE_DIRS}>"
+        "$<BUILD_INTERFACE:${RIGEL_COMMON_INCLUDE_DIRS}>"
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     )
     target_compile_options(${_NAME}
-      PRIVATE ${TURBO_CC_LIB_COPTS})
-    target_compile_definitions(${_NAME} PUBLIC ${TURBO_CC_LIB_DEFINES})
+      PRIVATE ${RIGEL_CC_LIB_COPTS})
+    target_compile_definitions(${_NAME} PUBLIC ${RIGEL_CC_LIB_DEFINES})
 
     # Add all Turbo targets to a a folder in the IDE for organization.
-    if(TURBO_CC_LIB_PUBLIC)
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER})
-    elseif(TURBO_CC_LIB_TESTONLY)
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
+    if(RIGEL_CC_LIB_PUBLIC)
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${RIGEL_IDE_FOLDER})
+    elseif(RIGEL_CC_LIB_TESTONLY)
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${RIGEL_IDE_FOLDER}/test)
     else()
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/internal)
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${RIGEL_IDE_FOLDER}/internal)
     endif()
 
-    if(TURBO_PROPAGATE_CXX_STD)
+    if(RIGEL_PROPAGATE_CXX_STD)
       # Turbo libraries require C++14 as the current minimum standard. When
       # compiled with C++17 (either because it is the compiler's default or
       # explicitly requested), then Turbo requires C++17.
-      target_compile_features(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
+      target_compile_features(${_NAME} PUBLIC ${RIGEL_INTERNAL_CXX_STD_FEATURE})
     endif()
 
     # When being installed, we lose the  prefix.  We want to put it back
     # to have properly named lib files.  This is a no-op when we are not being
     # installed.
-    if(TURBO_ENABLE_INSTALL)
+    if(RIGEL_ENABLE_INSTALL)
       set_target_properties(${_NAME} PROPERTIES
         OUTPUT_NAME "${_NAME}"
         SOVERSION 0
@@ -302,35 +302,35 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
   else()
     # Generating header-only library
     add_library(${_NAME} INTERFACE)
-    target_include_directories(${_NAME} ${TURBO_INTERNAL_INCLUDE_WARNING_GUARD}
+    target_include_directories(${_NAME} ${RIGEL_INTERNAL_INCLUDE_WARNING_GUARD}
       INTERFACE
-        "$<BUILD_INTERFACE:${TURBO_COMMON_INCLUDE_DIRS}>"
+        "$<BUILD_INTERFACE:${RIGEL_COMMON_INCLUDE_DIRS}>"
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
       )
 
     if (_build_type STREQUAL "dll")
-        set(TURBO_CC_LIB_DEPS turbo_dll)
+        set(RIGEL_CC_LIB_DEPS rigel_dll)
     endif()
 
     target_link_libraries(${_NAME}
       INTERFACE
-        ${TURBO_CC_LIB_DEPS}
-        ${TURBO_CC_LIB_LINKOPTS}
-        ${TURBO_DEFAULT_LINKOPTS}
+        ${RIGEL_CC_LIB_DEPS}
+        ${RIGEL_CC_LIB_LINKOPTS}
+        ${RIGEL_DEFAULT_LINKOPTS}
     )
-    target_compile_definitions(${_NAME} INTERFACE ${TURBO_CC_LIB_DEFINES})
+    target_compile_definitions(${_NAME} INTERFACE ${RIGEL_CC_LIB_DEFINES})
 
-    if(TURBO_PROPAGATE_CXX_STD)
+    if(RIGEL_PROPAGATE_CXX_STD)
       # Turbo libraries require C++14 as the current minimum standard.
       # Top-level application CMake projects should ensure a consistent C++
       # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-      target_compile_features(${_NAME} INTERFACE ${TURBO_INTERNAL_CXX_STD_FEATURE})
+      target_compile_features(${_NAME} INTERFACE ${RIGEL_INTERNAL_CXX_STD_FEATURE})
     endif()
   endif()
 
   # TODO currently we don't install googletest alongside abseil sources, so
   # installed abseil can't be tested.
-  if(NOT TURBO_CC_LIB_TESTONLY AND TURBO_ENABLE_INSTALL)
+  if(NOT RIGEL_CC_LIB_TESTONLY AND RIGEL_ENABLE_INSTALL)
     install(TARGETS ${_NAME} EXPORT ${PROJECT_NAME}Targets
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -338,10 +338,10 @@ Cflags: -I\${includedir}${PC_CFLAGS}\n")
     )
   endif()
 
-    add_library(rigel::${TURBO_CC_LIB_NAME} ALIAS ${_NAME})
+    add_library(rigel::${RIGEL_CC_LIB_NAME} ALIAS ${_NAME})
 endfunction()
 
-# turbo_cc_test()
+# rigel_cc_test()
 #
 # CMake function to imitate Bazel's cc_test rule.
 #
@@ -354,11 +354,11 @@ endfunction()
 # LINKOPTS: List of link options
 #
 # Note:
-# By default, turbo_cc_test will always create a binary named ${NAME}.
+# By default, rigel_cc_test will always create a binary named ${NAME}.
 # This will also add it to ctest list as ${NAME}.
 #
 # Usage:
-# turbo_cc_library(
+# rigel_cc_library(
 #   NAME
 #     awesome
 #   HDRS
@@ -368,7 +368,7 @@ endfunction()
 #   PUBLIC
 # )
 #
-# turbo_cc_test(
+# rigel_cc_test(
 #   NAME
 #     awesome_test
 #   SRCS
@@ -378,170 +378,63 @@ endfunction()
 #     GTest::gmock
 #     GTest::gtest_main
 # )
-function(turbo_cc_test)
-  if(NOT (BUILD_TESTING AND TURBO_BUILD_TESTING))
+function(rigel_cc_test)
+  if(NOT (BUILD_TESTING AND RIGEL_BUILD_TESTING))
     return()
   endif()
 
-  cmake_parse_arguments(TURBO_CC_TEST
+  cmake_parse_arguments(RIGEL_CC_TEST
     ""
     "NAME"
     "SRCS;COPTS;DEFINES;LINKOPTS;DEPS"
     ${ARGN}
   )
 
-  set(_NAME "turbo_${TURBO_CC_TEST_NAME}")
+  set(_NAME "rigel_${RIGEL_CC_TEST_NAME}")
 
   add_executable(${_NAME} "")
-  target_sources(${_NAME} PRIVATE ${TURBO_CC_TEST_SRCS})
+  target_sources(${_NAME} PRIVATE ${RIGEL_CC_TEST_SRCS})
   target_include_directories(${_NAME}
-    PUBLIC ${TURBO_COMMON_INCLUDE_DIRS}
+    PUBLIC ${RIGEL_COMMON_INCLUDE_DIRS}
     PRIVATE ${GMOCK_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS}
   )
 
-  if (${TURBO_BUILD_DLL})
+  if (${RIGEL_BUILD_DLL})
     target_compile_definitions(${_NAME}
       PUBLIC
-        ${TURBO_CC_TEST_DEFINES}
-        TURBO_CONSUME_DLL
+        ${RIGEL_CC_TEST_DEFINES}
+        RIGEL_CONSUME_DLL
         GTEST_LINKED_AS_SHARED_LIBRARY=1
     )
 
-    # Replace dependencies on targets inside the DLL with turbo_dll itself.
-    turbo_internal_dll_targets(
-      DEPS ${TURBO_CC_TEST_DEPS}
-      OUTPUT TURBO_CC_TEST_DEPS
+    # Replace dependencies on targets inside the DLL with rigel_dll itself.
+    rigel_internal_dll_targets(
+      DEPS ${RIGEL_CC_TEST_DEPS}
+      OUTPUT RIGEL_CC_TEST_DEPS
     )
   else()
     target_compile_definitions(${_NAME}
       PUBLIC
-        ${TURBO_CC_TEST_DEFINES}
+        ${RIGEL_CC_TEST_DEFINES}
     )
   endif()
   target_compile_options(${_NAME}
-    PRIVATE ${TURBO_CC_TEST_COPTS}
+    PRIVATE ${RIGEL_CC_TEST_COPTS}
   )
 
   target_link_libraries(${_NAME}
-    PUBLIC ${TURBO_CC_TEST_DEPS}
-    PRIVATE ${TURBO_CC_TEST_LINKOPTS}
+    PUBLIC ${RIGEL_CC_TEST_DEPS}
+    PRIVATE ${RIGEL_CC_TEST_LINKOPTS}
   )
   # Add all Turbo targets to a folder in the IDE for organization.
-  set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
+  set_property(TARGET ${_NAME} PROPERTY FOLDER ${RIGEL_IDE_FOLDER}/test)
 
-  if(TURBO_PROPAGATE_CXX_STD)
+  if(RIGEL_PROPAGATE_CXX_STD)
     # Turbo libraries require C++14 as the current minimum standard.
     # Top-level application CMake projects should ensure a consistent C++
     # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-    target_compile_features(${_NAME} INTERFACE ${TURBO_INTERNAL_CXX_STD_FEATURE})
+    target_compile_features(${_NAME} INTERFACE ${RIGEL_INTERNAL_CXX_STD_FEATURE})
   endif()
 
   add_test(NAME ${_NAME} COMMAND ${_NAME})
 endfunction()
-
-
-# turbo_cc_binary()
-#
-# CMake function to imitate Bazel's cc_test rule.
-#
-# Parameters:
-# NAME: name of target (see Usage below)
-# SRCS: List of source files for the binary
-# DEPS: List of other libraries to be linked in to the binary targets
-# COPTS: List of private compile options
-# DEFINES: List of public defines
-# LINKOPTS: List of link options
-#
-# Note:
-# By default, turbo_cc_binary will always create a binary named turbo_${NAME}.
-# This will also add it to ctest list as turbo_${NAME}.
-#
-# Usage:
-# turbo_cc_library(
-#   NAME
-#     awesome
-#   HDRS
-#     "a.h"
-#   SRCS
-#     "a.cc"
-#   PUBLIC
-# )
-#
-# turbo_cc_binary(
-#   NAME
-#     awesome_test
-#   SRCS
-#     "awesome_test.cc"
-#   DEPS
-#     rigel::awesome
-#     GTest::gmock
-#     GTest::gtest_main
-# )
-function(turbo_cc_binary)
-
-  cmake_parse_arguments(TURBO_CC_BINARY
-          ""
-          "NAME"
-          "SRCS;COPTS;DEFINES;LINKOPTS;DEPS"
-          ${ARGN}
-          )
-
-  set(_NAME "${TURBO_CC_BINARY_NAME}")
-
-  add_executable(${_NAME} "")
-  target_sources(${_NAME} PRIVATE ${TURBO_CC_BINARY_SRCS})
-  target_include_directories(${_NAME}
-          PUBLIC ${TURBO_COMMON_INCLUDE_DIRS}
-          PRIVATE ${GMOCK_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS}
-          )
-
-  if (${TURBO_BUILD_DLL})
-    target_compile_definitions(${_NAME}
-            PUBLIC
-            ${TURBO_CC_BINARY_DEFINES}
-            TURBO_CONSUME_DLL
-            GTEST_LINKED_AS_SHARED_LIBRARY=1
-            )
-
-    # Replace dependencies on targets inside the DLL with turbo_dll itself.
-    turbo_internal_dll_targets(
-            DEPS ${TURBO_CC_BINARY_DEPS}
-            OUTPUT TURBO_CC_BINARY_DEPS
-    )
-  else()
-    target_compile_definitions(${_NAME}
-            PUBLIC
-            ${TURBO_CC_BINARY_DEFINES}
-            )
-  endif()
-  target_compile_options(${_NAME}
-          PRIVATE ${TURBO_CC_LIB_COPTS}
-          )
-
-  target_link_libraries(${_NAME}
-          PUBLIC ${TURBO_CC_BINARY_DEPS}
-          PRIVATE ${TURBO_CC_BINARY_LINKOPTS}
-          )
-  # Add all Turbo targets to a folder in the IDE for organization.
-  set_property(TARGET ${_NAME} PROPERTY FOLDER ${TURBO_IDE_FOLDER}/test)
-
-  if(TURBO_PROPAGATE_CXX_STD)
-    # Turbo libraries require C++14 as the current minimum standard.
-    # Top-level application CMake projects should ensure a consistent C++
-    # standard for all compiled sources by setting CMAKE_CXX_STANDARD.
-    _turbo_target_compile_features_if_available(${_NAME} PUBLIC ${TURBO_INTERNAL_CXX_STD_FEATURE})
-  else()
-    # Note: This is legacy (before CMake 3.8) behavior. Setting the
-    # target-level CXX_STANDARD property to TURBO_CXX_STANDARD (which is
-    # initialized by CMAKE_CXX_STANDARD) should have no real effect, since
-    # that is the default value anyway.
-    #
-    # CXX_STANDARD_REQUIRED does guard against the top-level CMake project
-    # not having enabled CMAKE_CXX_STANDARD_REQUIRED (which prevents
-    # "decaying" to an older standard if the requested one isn't available).
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${TURBO_CXX_STANDARD})
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
-  endif()
-
-endfunction()
-

@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "turbo/platform/port.h"
-#include "turbo/strings/substitute.h"
+#include "rigel/platform/port.h"
+#include "rigel/strings/substitute.h"
 #include <iostream>
 
-#if !defined(TURBO_LTS_RELEASE_VERSION) || TURBO_LTS_RELEASE_VERSION != 99998877
-#error TURBO_LTS_RELEASE_VERSION is not set correctly.
+#if !defined(RIGEL_LTS_RELEASE_VERSION) || RIGEL_LTS_RELEASE_VERSION != 99998877
+#error RIGEL_LTS_RELEASE_VERSION is not set correctly.
 #endif
 
-#if !defined(TURBO_LTS_RELEASE_PATCH_LEVEL) || TURBO_LTS_RELEASE_PATCH_LEVEL != 0
-#error TURBO_LTS_RELEASE_PATCH_LEVEL is not set correctly.
+#if !defined(RIGEL_LTS_RELEASE_PATCH_LEVEL) || RIGEL_LTS_RELEASE_PATCH_LEVEL != 0
+#error RIGEL_LTS_RELEASE_PATCH_LEVEL is not set correctly.
 #endif
 
 int main(int argc, char** argv) {
   for (int i = 0; i < argc; ++i) {
-    std::cout << turbo::Substitute("Arg $0: $1\n", i, argv[i]);
+    std::cout << rigel::Substitute("Arg $0: $1\n", i, argv[i]);
   }
 }

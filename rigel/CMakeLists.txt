@@ -1,5 +1,5 @@
 #
-# Copyright 2023 The Turbo Authors.
+# Copyright 2020 The Turbo Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@
 # limitations under the License.
 #
 
-set(RIGEL_ALL_SRCS
-        "fiber/context.cc")
 
-turbo_cc_library(
+file(GLOB_RECURSE RIGEL_FIBER_SRC
+        "workflow/*.cc")
+
+set(RIGEL_ALL_SRC
+        ${RIGEL_FIBER_SRC})
+
+rigel_cc_library(
         NAME
         rigel
         SRCS
-        ${RIGEL_ALL_SRCS}
+        ${RIGEL_ALL_SRC}
         COPTS
-        ${TURBO_DEFAULT_COPTS}
-        ${TURBO_RANDOM_RANDEN_COPTS}
-        ${TURBO_SIMD_FLAGS}
+        ${RIGEL_DEFAULT_COPTS}
         DEPS
-        ${TURBO_DYLINK}
+        ${RIGEL_DYLINK}
 )
+
+if(RIGEL_BUILD_TESTING)
+    add_subdirectory(workflow)
+endif()

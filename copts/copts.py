@@ -5,13 +5,13 @@ compilation options:
 
   (1) Edit the appropriate list in this file based on the platform the flag is
       needed on.
-  (2) Run `<path_to_turbo>/copts/generate_copts.py`.
+  (2) Run `<path_to_rigel>/copts/generate_copts.py`.
 
 The generated copts are consumed by configure_copts.bzl and
 TurboConfigureCopts.cmake.
 """
 
-TURBO_GCC_FLAGS = [
+RIGEL_GCC_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -30,7 +30,7 @@ TURBO_GCC_FLAGS = [
     "-DNOMINMAX",
 ]
 
-TURBO_GCC_TEST_ADDITIONAL_FLAGS = [
+RIGEL_GCC_TEST_ADDITIONAL_FLAGS = [
     "-Wno-deprecated-declarations",
     "-Wno-missing-declarations",
     "-Wno-self-move",
@@ -40,7 +40,7 @@ TURBO_GCC_TEST_ADDITIONAL_FLAGS = [
     "-Wno-unused-private-field",
 ]
 
-TURBO_LLVM_FLAGS = [
+RIGEL_LLVM_FLAGS = [
     "-Wall",
     "-Wextra",
     "-Wcast-qual",
@@ -83,7 +83,7 @@ TURBO_LLVM_FLAGS = [
     "-DNOMINMAX",
 ]
 
-TURBO_LLVM_TEST_ADDITIONAL_FLAGS = [
+RIGEL_LLVM_TEST_ADDITIONAL_FLAGS = [
     "-Wno-deprecated-declarations",
     "-Wno-implicit-int-conversion",
     "-Wno-missing-prototypes",
@@ -153,19 +153,19 @@ def GccStyleFilterAndCombine(default_flags, test_flags):
   return [f for f in default_flags if f not in remove] + test_flags
 
 COPT_VARS = {
-    "TURBO_GCC_FLAGS": TURBO_GCC_FLAGS,
-    "TURBO_GCC_TEST_FLAGS": GccStyleFilterAndCombine(
-        TURBO_GCC_FLAGS, TURBO_GCC_TEST_ADDITIONAL_FLAGS),
-    "TURBO_LLVM_FLAGS": TURBO_LLVM_FLAGS,
-    "TURBO_LLVM_TEST_FLAGS": GccStyleFilterAndCombine(
-        TURBO_LLVM_FLAGS, TURBO_LLVM_TEST_ADDITIONAL_FLAGS),
-    "TURBO_CLANG_CL_FLAGS":
+    "RIGEL_GCC_FLAGS": RIGEL_GCC_FLAGS,
+    "RIGEL_GCC_TEST_FLAGS": GccStyleFilterAndCombine(
+        RIGEL_GCC_FLAGS, RIGEL_GCC_TEST_ADDITIONAL_FLAGS),
+    "RIGEL_LLVM_FLAGS": RIGEL_LLVM_FLAGS,
+    "RIGEL_LLVM_TEST_FLAGS": GccStyleFilterAndCombine(
+        RIGEL_LLVM_FLAGS, RIGEL_LLVM_TEST_ADDITIONAL_FLAGS),
+    "RIGEL_CLANG_CL_FLAGS":
         MSVC_BIG_WARNING_FLAGS + MSVC_DEFINES,
-    "TURBO_CLANG_CL_TEST_FLAGS":
-        MSVC_BIG_WARNING_FLAGS + MSVC_DEFINES + TURBO_LLVM_TEST_ADDITIONAL_FLAGS,
-    "TURBO_MSVC_FLAGS":
+    "RIGEL_CLANG_CL_TEST_FLAGS":
+        MSVC_BIG_WARNING_FLAGS + MSVC_DEFINES + RIGEL_LLVM_TEST_ADDITIONAL_FLAGS,
+    "RIGEL_MSVC_FLAGS":
         MSVC_BIG_WARNING_FLAGS + MSVC_WARNING_FLAGS + MSVC_DEFINES,
-    "TURBO_MSVC_TEST_FLAGS":
+    "RIGEL_MSVC_TEST_FLAGS":
         MSVC_BIG_WARNING_FLAGS + MSVC_WARNING_FLAGS + MSVC_DEFINES + [
             "/wd4018",  # signed/unsigned mismatch
             "/wd4101",  # unreferenced local variable
@@ -173,7 +173,7 @@ COPT_VARS = {
             "/wd4996",  # use of deprecated symbol
             "/DNOMINMAX",  # disable the min() and max() macros from <windows.h>
         ],
-    "TURBO_MSVC_LINKOPTS": [
+    "RIGEL_MSVC_LINKOPTS": [
         # Object file doesn't export any previously undefined symbols
         "-ignore:4221",
     ],
@@ -181,11 +181,11 @@ COPT_VARS = {
     # Standard). These flags are used for detecting whether or not the target
     # architecture has hardware support for AES instructions which can be used
     # to improve performance of some random bit generators.
-    "TURBO_RANDOM_HWAES_ARM64_FLAGS": ["-march=armv8-a+crypto"],
-    "TURBO_RANDOM_HWAES_ARM32_FLAGS": ["-mfpu=neon"],
-    "TURBO_RANDOM_HWAES_X64_FLAGS": [
+    "RIGEL_RANDOM_HWAES_ARM64_FLAGS": ["-march=armv8-a+crypto"],
+    "RIGEL_RANDOM_HWAES_ARM32_FLAGS": ["-mfpu=neon"],
+    "RIGEL_RANDOM_HWAES_X64_FLAGS": [
         "-maes",
         "-msse4.1",
     ],
-    "TURBO_RANDOM_HWAES_MSVC_X64_FLAGS": [],
+    "RIGEL_RANDOM_HWAES_MSVC_X64_FLAGS": [],
 }

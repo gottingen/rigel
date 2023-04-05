@@ -1,2 +1,3 @@
 # rigel
-runtime
+
+runtime for ai infra and rpc

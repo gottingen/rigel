@@ -64,21 +64,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # when rigel is included as subproject (i.e. using add_subdirectory(abseil-cpp))
 # in the source tree of a project that uses it, install rules are disabled.
 if(NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  option(TURBO_ENABLE_INSTALL "Enable install rule" OFF)
+  option(RIGEL_ENABLE_INSTALL "Enable install rule" OFF)
 else()
-  option(TURBO_ENABLE_INSTALL "Enable install rule" ON)
+  option(RIGEL_ENABLE_INSTALL "Enable install rule" ON)
 endif()
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
-option(TURBO_PROPAGATE_CXX_STD
+option(RIGEL_PROPAGATE_CXX_STD
   "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
   OFF)  # TODO: Default to ON for CMake 3.8 and greater.
-if(NOT TURBO_PROPAGATE_CXX_STD)
-  message(WARNING "A future Turbo release will default TURBO_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
+if(NOT RIGEL_PROPAGATE_CXX_STD)
+  message(WARNING "A future Turbo release will default RIGEL_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
 endif()
 
-option(TURBO_USE_SYSTEM_INCLUDES
+option(RIGEL_USE_SYSTEM_INCLUDES
   "Silence warnings in Turbo headers by marking them as SYSTEM includes"
   OFF)
 
@@ -89,9 +89,7 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
-include(TurboDll)
 include(TurboHelpers)
-include(Simd)
 
 
 ##
@@ -106,12 +104,12 @@ include(Simd)
 
 
 # include current path
-list(APPEND TURBO_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND RIGEL_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(TURBO_USING_CLANG ON)
+  set(RIGEL_USING_CLANG ON)
 else()
-  set(TURBO_USING_CLANG OFF)
+  set(RIGEL_USING_CLANG OFF)
 endif()
 
 # find dependencies
@@ -120,38 +118,35 @@ find_package(Threads REQUIRED)
 
 include(CMakeDependentOption)
 
-option(TURBO_BUILD_TESTING
+option(RIGEL_BUILD_TESTING
   "If ON, Turbo will build all of Turbo's own tests." ON)
 
-option(TURBO_BUILD_EXAMPLE
-        "If ON, Turbo will build all of Turbo's example." ON)
-
-option(TURBO_BUILD_TEST_HELPERS
+option(RIGEL_BUILD_TEST_HELPERS
   "If ON, Turbo will build libraries that you can use to write tests against Turbo code. This option requires that Turbo is configured to use GoogleTest."
   OFF)
 
-option(TURBO_USE_EXTERNAL_GOOGLETEST
+option(RIGEL_USE_EXTERNAL_GOOGLETEST
   "If ON, Turbo will assume that the targets for GoogleTest are already provided by the including project. This makes sense when Turbo is used with add_subdirectory." OFF)
 
-cmake_dependent_option(TURBO_FIND_GOOGLETEST
+cmake_dependent_option(RIGEL_FIND_GOOGLETEST
   "If ON, Turbo will use find_package(GTest) rather than assuming that GoogleTest is already provided by the including project."
   ON
-  "TURBO_USE_EXTERNAL_GOOGLETEST"
+  "RIGEL_USE_EXTERNAL_GOOGLETEST"
   OFF)
 
 
-option(TURBO_USE_GOOGLETEST_HEAD
+option(RIGEL_USE_GOOGLETEST_HEAD
   "If ON, abseil will download HEAD from GoogleTest at config time." ON)
 
-set(TURBO_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
+set(RIGEL_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
 
-set(TURBO_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
-  "If TURBO_USE_GOOGLETEST_HEAD is OFF and TURBO_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
+set(RIGEL_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
+  "If RIGEL_USE_GOOGLETEST_HEAD is OFF and RIGEL_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
   )
 
-if((BUILD_TESTING AND TURBO_BUILD_TESTING) OR TURBO_BUILD_TEST_HELPERS)
-  if (TURBO_USE_EXTERNAL_GOOGLETEST)
-    if (TURBO_FIND_GOOGLETEST)
+if((BUILD_TESTING AND RIGEL_BUILD_TESTING) OR RIGEL_BUILD_TEST_HELPERS)
+  if (RIGEL_USE_EXTERNAL_GOOGLETEST)
+    if (RIGEL_FIND_GOOGLETEST)
       find_package(GTest REQUIRED)
     elseif(NOT TARGET GTest::gtest)
       if(TARGET gtest)
@@ -161,43 +156,46 @@ if((BUILD_TESTING AND TURBO_BUILD_TESTING) OR TURBO_BUILD_TEST_HELPERS)
         add_library(GTest::gmock ALIAS gmock)
         add_library(GTest::gmock_main ALIAS gmock_main)
       else()
-        message(FATAL_ERROR "TURBO_USE_EXTERNAL_GOOGLETEST is ON and TURBO_FIND_GOOGLETEST is OFF, which means that the top-level project must build the Google Test project. However, the target gtest was not found.")
+        message(FATAL_ERROR "RIGEL_USE_EXTERNAL_GOOGLETEST is ON and RIGEL_FIND_GOOGLETEST is OFF, which means that the top-level project must build the Google Test project. However, the target gtest was not found.")
       endif()
     endif()
   else()
-    set(turbo_gtest_build_dir ${CMAKE_BINARY_DIR}/googletest-build)
-    if(TURBO_USE_GOOGLETEST_HEAD AND TURBO_GOOGLETEST_DOWNLOAD_URL)
-      message(FATAL_ERROR "Do not set both TURBO_USE_GOOGLETEST_HEAD and TURBO_GOOGLETEST_DOWNLOAD_URL")
+    set(rigel_gtest_build_dir ${CMAKE_BINARY_DIR}/googletest-build)
+    if(RIGEL_USE_GOOGLETEST_HEAD AND RIGEL_GOOGLETEST_DOWNLOAD_URL)
+      message(FATAL_ERROR "Do not set both RIGEL_USE_GOOGLETEST_HEAD and RIGEL_GOOGLETEST_DOWNLOAD_URL")
     endif()
-    if(TURBO_USE_GOOGLETEST_HEAD)
-      set(turbo_gtest_download_url "https://gitee.com/gottingen/googletest/repository/archive/main.zip")
-    elseif(TURBO_GOOGLETEST_DOWNLOAD_URL)
-      set(turbo_gtest_download_url ${TURBO_GOOGLETEST_DOWNLOAD_URL})
+    if(RIGEL_USE_GOOGLETEST_HEAD)
+      set(rigel_gtest_download_url "https://gitee.com/gottingen/googletest/repository/archive/main.zip")
+    elseif(RIGEL_GOOGLETEST_DOWNLOAD_URL)
+      set(rigel_gtest_download_url ${RIGEL_GOOGLETEST_DOWNLOAD_URL})
     endif()
-    if(turbo_gtest_download_url)
-      set(turbo_gtest_src_dir ${CMAKE_BINARY_DIR}/googletest-src)
+    if(rigel_gtest_download_url)
+      set(rigel_gtest_src_dir ${CMAKE_BINARY_DIR}/googletest-src)
     else()
-      set(turbo_gtest_src_dir ${TURBO_LOCAL_GOOGLETEST_DIR})
+      set(rigel_gtest_src_dir ${RIGEL_LOCAL_GOOGLETEST_DIR})
     endif()
     include(CMake/Googletest/DownloadGTest.cmake)
   endif()
 endif()
 
-set(TURBO_DYLINK)
+set(RIGEL_DYLINK)
 if (APPLE)
   find_library(CoreFoundation CoreFoundation)
-  list(APPEND TURBO_DYLINK ${CoreFoundation} pthread)
+  list(APPEND RIGEL_DYLINK ${CoreFoundation} pthread)
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-  list(APPEND TURBO_DYLINK rt dl pthread)
+  list(APPEND RIGEL_DYLINK rt dl pthread)
 endif ()
+
+find_package(Turbo REQUIRED)
+include_directories(${TURBO_INCLUDE_DIR})
+
+set(DYLIBS
+        ${TURBO_LIBRARIES}
+        )
 
 add_subdirectory(rigel)
 
-if(TURBO_BUILD_EXAMPLE)
-  add_subdirectory(examples)
-endif()
-
-if(TURBO_ENABLE_INSTALL)
+if(RIGEL_ENABLE_INSTALL)
   # rigel:lts-remove-begin(system installation is supported for LTS releases)
   # We don't support system-wide installation
   list(APPEND SYSTEM_INSTALL_DIRS "/usr/local" "/usr" "/opt/" "/opt/local" "c:/Program Files/${PROJECT_NAME}")
@@ -217,7 +215,7 @@ if(TURBO_ENABLE_INSTALL)
   )
 
   configure_package_config_file(
-    CMake/turboConfig.cmake.in
+    CMake/rigelConfig.cmake.in
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
     INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
   )
@@ -228,7 +226,7 @@ if(TURBO_ENABLE_INSTALL)
   # Turbo only has a version in LTS releases.  This mechanism is accomplished
   # Turbo's internal Copybara (https://github.com/google/copybara) workflows and
   # isn't visible in the CMake buildsystem itself.
-  if(turbo_VERSION)
+  if(rigel_VERSION)
     write_basic_package_version_file(
       "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
       COMPATIBILITY ExactVersion
@@ -237,7 +235,7 @@ if(TURBO_ENABLE_INSTALL)
     install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
       DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     )
-  endif()  # turbo_VERSION
+  endif()  # rigel_VERSION
 
   install(DIRECTORY rigel
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
@@ -247,6 +245,4 @@ if(TURBO_ENABLE_INSTALL)
       PATTERN "copts" EXCLUDE
       PATTERN "testdata" EXCLUDE
     )
-
-
-endif()  # TURBO_ENABLE_INSTALL
+endif()  # RIGEL_ENABLE_INSTALL

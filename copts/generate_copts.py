@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Turbo compile compile option configs.
 
-Usage: <path_to_turbo>/copts/generate_copts.py
+Usage: <path_to_rigel>/copts/generate_copts.py
 
 The configs are generated from copts.py.
 """
@@ -15,8 +15,8 @@ from copts import COPT_VARS
 def file_header_lines():
   return [
       "GENERATED! DO NOT MANUALLY EDIT THIS FILE.", "",
-      "(1) Edit turbo/copts/copts.py.",
-      "(2) Run `python <path_to_turbo>/copts/generate_copts.py`."
+      "(1) Edit rigel/copts/copts.py.",
+      "(2) Run `python <path_to_rigel>/copts/generate_copts.py`."
   ]
 
 

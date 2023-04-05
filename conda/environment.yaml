@@ -1,7 +1,6 @@
-name: turbo-dev
+name: rigel-dev
 channels:
   - conda-forge
-  - defaults
   - mgottingen
 dependencies:
   - turbo

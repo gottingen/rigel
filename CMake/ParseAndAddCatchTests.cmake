@@ -17,10 +17,10 @@
 #        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake.modules/")          #
 #        enable_testing()                                                                          #
 #                                                                                                  #
-#        find_path(CATCH_INCLUDE_DIR "catch.hpp")                                                  #
+#        find_path(CATCH_INCLUDE_DIR "catch.h")                                                  #
 #        include_directories(${INCLUDE_DIRECTORIES} ${CATCH_INCLUDE_DIR})                          #
 #                                                                                                  #
-#        file(GLOB SOURCE_FILES "*.cc")                                                           #
+#        file(GLOB SOURCE_FILES "*.cpp")                                                           #
 #        add_executable(${PROJECT_NAME} ${SOURCE_FILES})                                           #
 #                                                                                                  #
 #        include(ParseAndAddCatchTests)                                                            #
