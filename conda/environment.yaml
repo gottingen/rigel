@@ -1,0 +1,7 @@
+name: turbo-dev
+channels:
+  - conda-forge
+  - defaults
+  - mgottingen
+dependencies:
+  - turbo
