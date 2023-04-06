@@ -47,6 +47,7 @@ foreach(unittest IN LISTS TF_UNITTESTS)
           COPTS
           ${TURBO_TEST_COPTS}
           DEPS
+          ${RIGEL_DYLINK}
   )
 endforeach()
 
