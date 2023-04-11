@@ -193,7 +193,7 @@ class SmallVectorTemplateCommon : public SmallVectorBase {
   inline size_type max_size() const { return size_type(-1) / sizeof(T); }
 
   /// Return the total number of elements in the currently allocated buffer.
-  size_t capacity() const { return capacity_ptr() - begin(); }
+  size_t capacity() const { return static_cast<size_t>(capacity_ptr() - begin()); }
 
   /// Return a pointer to the vector's buffer, even if empty().
   pointer data() { return pointer(begin()); }
@@ -355,7 +355,7 @@ protected:
     // use memcpy here. Note that I and E are iterators and thus might be
     // invalid for memcpy if they are equal.
     if (I != E)
-      memcpy(Dest, I, (E - I) * sizeof(T));
+      memcpy(Dest, I, static_cast<size_t>((E - I)) * sizeof(T));
   }
 
   /// Double the size of the allocated memory, guaranteeing space for at

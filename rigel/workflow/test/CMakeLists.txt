@@ -45,7 +45,8 @@ foreach(unittest IN LISTS TF_UNITTESTS)
           SRCS
           ${unittest}.cc
           COPTS
-          ${TURBO_TEST_COPTS}
+          #${TURBO_TEST_COPTS}
+          ${CMAKE_CXX_FLAGS}
           DEPS
           ${RIGEL_DYLINK}
   )

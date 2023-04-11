@@ -28,7 +28,7 @@ Task FlowBuilder::reduce(B beg, E end, T& init, O bop) {
     //size_t C = (c == 0) ? 1 : c;
     size_t chunk_size = 1;
     size_t W = sf._executor.num_workers();
-    size_t N = std::distance(beg, end);
+    size_t N = static_cast<size_t>(std::distance(beg, end));
 
     // only myself - no need to spawn another graph
     if(W <= 1 || N <= chunk_size) {
@@ -168,7 +168,7 @@ Task FlowBuilder::transform_reduce(
     //size_t chunk_size = (c == 0) ? 1 : c;
     size_t chunk_size = 1;
     size_t W = sf._executor.num_workers();
-    size_t N = std::distance(beg, end);
+    size_t N = static_cast<size_t>(std::distance(beg, end));
 
     // only myself - no need to spawn another graph
     if(W <= 1 || N <= chunk_size) {

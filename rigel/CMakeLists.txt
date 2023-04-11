@@ -14,11 +14,11 @@
 # limitations under the License.
 #
 
-file(GLOB_RECURSE RIGEL_FIBER_SRC
-        "workflow/*.cc")
+file(GLOB_RECURSE RIGEL_METRICS_SRC
+        "metrics/*.cc")
 
 set(RIGEL_ALL_SRC
-        ${RIGEL_FIBER_SRC})
+        ${RIGEL_METRICS_SRC})
 
 rigel_cc_library(
         NAME

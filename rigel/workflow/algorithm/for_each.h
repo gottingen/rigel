@@ -32,7 +32,7 @@ Task FlowBuilder::for_each(B beg, E end, C c) {
 
     size_t chunk_size = 1;
     size_t W = sf._executor.num_workers();
-    size_t N = std::distance(beg, end);
+    size_t N = static_cast<size_t>(std::distance(beg, end));
 
     // only myself - no need to spawn another graph
     if(W <= 1 || N <= chunk_size) {

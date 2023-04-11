@@ -69,6 +69,7 @@ else()
   option(RIGEL_ENABLE_INSTALL "Enable install rule" ON)
 endif()
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_STANDARD 17)
 
 option(RIGEL_PROPAGATE_CXX_STD
