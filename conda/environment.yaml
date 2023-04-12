@@ -4,3 +4,4 @@ channels:
   - mgottingen
 dependencies:
   - turbo
+  - boost

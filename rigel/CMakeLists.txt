@@ -17,8 +17,23 @@
 file(GLOB_RECURSE RIGEL_METRICS_SRC
         "metrics/*.cc")
 
+file(GLOB_RECURSE RIGEL_CORE_SRC "core/*.cc")
+file(GLOB_RECURSE RIGEL_COROUTINE_SRC "coroutine/*.cc")
+file(GLOB_RECURSE RIGEL_HTTP_SRC "http/*.cc")
+file(GLOB_RECURSE RIGEL_JSON_SRC "json/*.cc")
+file(GLOB_RECURSE RIGEL_NET_SRC "net/*.cc")
+file(GLOB_RECURSE RIGEL_UTIL_SRC "util/*.cc")
+file(GLOB_RECURSE RIGEL_WEB_SRC "websocket/*.cc")
+
 set(RIGEL_ALL_SRC
-        ${RIGEL_METRICS_SRC})
+        ${RIGEL_CORE_SRC}
+        ${RIGEL_COROUTINE_SRC}
+        ${RIGEL_HTTP_SRC}
+        ${RIGEL_JSON_SRC}
+        ${RIGEL_NET_SRC}
+        ${RIGEL_UTIL_SRC}
+        ${RIGEL_WEB_SRC}
+        )
 
 rigel_cc_library(
         NAME
