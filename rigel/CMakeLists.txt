@@ -14,12 +14,12 @@
 # limitations under the License.
 #
 
-
-file(GLOB_RECURSE RIGEL_FIBER_SRC
-        "workflow/*.cc")
-
 set(RIGEL_ALL_SRC
-        ${RIGEL_FIBER_SRC})
+        "framework/numa_utils.cc"
+        "memory/buffer_attributes.cc"
+        "memory/pinned_memory_manager.cc"
+        "thread/cleanup.cc"
+        )
 
 rigel_cc_library(
         NAME
@@ -33,5 +33,6 @@ rigel_cc_library(
 )
 
 if(RIGEL_BUILD_TESTING)
-    add_subdirectory(workflow)
+    add_subdirectory(memory)
+    #add_subdirectory(workflow)
 endif()
