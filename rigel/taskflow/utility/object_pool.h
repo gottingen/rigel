@@ -39,42 +39,42 @@ namespace rigel {
   template <typename T, size_t S> friend class ObjectPool;  \
   void* _object_pool_block
 
-// Class: ObjectPool
-//
-// The class implements an efficient thread-safe object pool motivated
-// by the Hoard memory allocator algorithm.
-// Different from the normal memory allocator, object pool allocates
-// only one object at a time.
-//
-// Internall, we use the following variables to maintain blocks and heaps:
-// X: size in byte of a item slot
-// M: number of items per block
-// F: emptiness threshold
-// B: number of bins per local heap (bin[B-1] is the full list)
-// W: number of items per bin
-// K: shrinkness constant
-//
-// Example scenario 1:
-// M = 30
-// F = 4
-// W = (30+4-1)/4 = 8
-//
-// b0: 0, 1, 2, 3, 4, 5, 6, 7
-// b1: 8, 9, 10, 11, 12, 13, 14, 15
-// b2: 16, 17, 18, 19, 20, 21, 22, 23
-// b3: 24, 25, 26, 27, 28, 29
-// b4: 30 (anything equal to M)
-//
-// Example scenario 2:
-// M = 32
-// F = 4
-// W = (32+4-1)/4 = 8
-// b0: 0, 1, 2, 3, 4, 5, 6, 7
-// b1: 8, 9, 10, 11, 12, 13, 14, 15
-// b2: 16, 17, 18, 19, 20, 21, 22, 23
-// b3: 24, 25, 26, 27, 28, 29, 30, 31
-// b4: 32 (anything equal to M)
-//
+    // Class: ObjectPool
+    //
+    // The class implements an efficient thread-safe object pool motivated
+    // by the Hoard memory allocator algorithm.
+    // Different from the normal memory allocator, object pool allocates
+    // only one object at a time.
+    //
+    // Internall, we use the following variables to maintain blocks and heaps:
+    // X: size in byte of a item slot
+    // M: number of items per block
+    // F: emptiness threshold
+    // B: number of bins per local heap (bin[B-1] is the full list)
+    // W: number of items per bin
+    // K: shrinkness constant
+    //
+    // Example scenario 1:
+    // M = 30
+    // F = 4
+    // W = (30+4-1)/4 = 8
+    //
+    // b0: 0, 1, 2, 3, 4, 5, 6, 7
+    // b1: 8, 9, 10, 11, 12, 13, 14, 15
+    // b2: 16, 17, 18, 19, 20, 21, 22, 23
+    // b3: 24, 25, 26, 27, 28, 29
+    // b4: 30 (anything equal to M)
+    //
+    // Example scenario 2:
+    // M = 32
+    // F = 4
+    // W = (32+4-1)/4 = 8
+    // b0: 0, 1, 2, 3, 4, 5, 6, 7
+    // b1: 8, 9, 10, 11, 12, 13, 14, 15
+    // b2: 16, 17, 18, 19, 20, 21, 22, 23
+    // b3: 24, 25, 26, 27, 28, 29, 30, 31
+    // b4: 32 (anything equal to M)
+    //
     template<typename T, size_t S = 65536>
     class ObjectPool {
 
