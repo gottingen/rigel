@@ -1,11 +1,11 @@
 #
-# Copyright 2020 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,235 +14,151 @@
 # limitations under the License.
 #
 
-# https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md
-# As of 2022-09-06, CMake 3.10 is the minimum supported version.
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
+
 
 # Compiler id for Apple Clang is now AppleClang.
 if (POLICY CMP0025)
-  cmake_policy(SET CMP0025 NEW)
+    cmake_policy(SET CMP0025 NEW)
 endif (POLICY CMP0025)
 
 # if command can use IN_LIST
 if (POLICY CMP0057)
-  cmake_policy(SET CMP0057 NEW)
+    cmake_policy(SET CMP0057 NEW)
 endif (POLICY CMP0057)
 
 # Project version variables are the empty string if version is unspecified
 if (POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
+    cmake_policy(SET CMP0048 NEW)
 endif (POLICY CMP0048)
 
 # option() honor variables
 if (POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
+    cmake_policy(SET CMP0077 NEW)
 endif (POLICY CMP0077)
 
 # Allow the user to specify the MSVC runtime
 if (POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
+    cmake_policy(SET CMP0091 NEW)
 endif (POLICY CMP0091)
 
 # try_compile() honors the CMAKE_CXX_STANDARD value
 if (POLICY CMP0067)
-  cmake_policy(SET CMP0067 NEW)
+    cmake_policy(SET CMP0067 NEW)
 endif (POLICY CMP0067)
 
 if (POLICY CMP0110)
-  cmake_policy(SET CMP0110 NEW)
+    cmake_policy(SET CMP0110 NEW)
 endif (POLICY CMP0110)
 
-project(rigel LANGUAGES CXX)
-include(CTest)
-
-# Output directory is correct by default for most build setups. However, when
-# building Turbo as a DLL, it is important to have the DLL in the same
-# directory as the executable using it. Thus, we put all executables in a single
-# /bin directory.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-# when rigel is included as subproject (i.e. using add_subdirectory(abseil-cpp))
-# in the source tree of a project that uses it, install rules are disabled.
-if(NOT CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  option(RIGEL_ENABLE_INSTALL "Enable install rule" OFF)
-else()
-  option(RIGEL_ENABLE_INSTALL "Enable install rule" ON)
-endif()
-
-set(CMAKE_CXX_STANDARD 17)
-
-option(RIGEL_PROPAGATE_CXX_STD
-  "Use CMake C++ standard meta features (e.g. cxx_std_14) that propagate to targets that link to Turbo"
-  OFF)  # TODO: Default to ON for CMake 3.8 and greater.
-if(NOT RIGEL_PROPAGATE_CXX_STD)
-  message(WARNING "A future Turbo release will default RIGEL_PROPAGATE_CXX_STD to ON for CMake 3.8 and up. We recommend enabling this option to ensure your project still builds correctly.")
-endif()
-
-option(RIGEL_USE_SYSTEM_INCLUDES
-  "Silence warnings in Turbo headers by marking them as SYSTEM includes"
-  OFF)
-
-list(APPEND CMAKE_MODULE_PATH
-  ${CMAKE_CURRENT_LIST_DIR}/CMake
-  ${CMAKE_CURRENT_LIST_DIR}/copts
-)
-
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-include(TurboHelpers)
+if (POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+endif (POLICY CMP0135)
 
 
-##
-## Using rigel targets
-##
-## all public rigel targets are
-## exported with the rigel:: prefix
-##
-## e.g rigel::base rigel::synchronization rigel::strings ....
-##
-## DO NOT rely on the internal targets outside of the prefix
+project(rigel CXX)
 
+set(PROJECT_DESCRIPTION "Hercules is an ahead of time compiler for a subset of the Python language framework.")
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 1)
+set(PROJECT_VERSION_PATCH 5)
+set(PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-# include current path
-list(APPEND RIGEL_COMMON_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/package)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/recipes)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/copts)
 
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  set(RIGEL_USING_CLANG ON)
-else()
-  set(RIGEL_USING_CLANG OFF)
-endif()
-
-# find dependencies
-## pthread
-find_package(Threads REQUIRED)
-
-include(CMakeDependentOption)
-
-option(RIGEL_BUILD_TESTING
-  "If ON, Turbo will build all of Turbo's own tests." ON)
-
-option(RIGEL_BUILD_TEST_HELPERS
-  "If ON, Turbo will build libraries that you can use to write tests against Turbo code. This option requires that Turbo is configured to use GoogleTest."
-  OFF)
-
-option(RIGEL_USE_EXTERNAL_GOOGLETEST
-  "If ON, Turbo will assume that the targets for GoogleTest are already provided by the including project. This makes sense when Turbo is used with add_subdirectory." OFF)
-
-cmake_dependent_option(RIGEL_FIND_GOOGLETEST
-  "If ON, Turbo will use find_package(GTest) rather than assuming that GoogleTest is already provided by the including project."
-  ON
-  "RIGEL_USE_EXTERNAL_GOOGLETEST"
-  OFF)
-
-
-option(RIGEL_USE_GOOGLETEST_HEAD
-  "If ON, abseil will download HEAD from GoogleTest at config time." ON)
-
-set(RIGEL_GOOGLETEST_DOWNLOAD_URL "" CACHE STRING "If set, download GoogleTest from this URL")
-
-set(RIGEL_LOCAL_GOOGLETEST_DIR "/usr/src/googletest" CACHE PATH
-  "If RIGEL_USE_GOOGLETEST_HEAD is OFF and RIGEL_GOOGLETEST_URL is not set, specifies the directory of a local GoogleTest checkout."
-  )
-
-if((BUILD_TESTING AND RIGEL_BUILD_TESTING) OR RIGEL_BUILD_TEST_HELPERS)
-  if (RIGEL_USE_EXTERNAL_GOOGLETEST)
-    if (RIGEL_FIND_GOOGLETEST)
-      find_package(GTest REQUIRED)
-    elseif(NOT TARGET GTest::gtest)
-      if(TARGET gtest)
-        # When Google Test is included directly rather than through find_package, the aliases are missing.
-        add_library(GTest::gtest ALIAS gtest)
-        add_library(GTest::gtest_main ALIAS gtest_main)
-        add_library(GTest::gmock ALIAS gmock)
-        add_library(GTest::gmock_main ALIAS gmock_main)
-      else()
-        message(FATAL_ERROR "RIGEL_USE_EXTERNAL_GOOGLETEST is ON and RIGEL_FIND_GOOGLETEST is OFF, which means that the top-level project must build the Google Test project. However, the target gtest was not found.")
-      endif()
-    endif()
-  else()
-    set(rigel_gtest_build_dir ${CMAKE_BINARY_DIR}/googletest-build)
-    if(RIGEL_USE_GOOGLETEST_HEAD AND RIGEL_GOOGLETEST_DOWNLOAD_URL)
-      message(FATAL_ERROR "Do not set both RIGEL_USE_GOOGLETEST_HEAD and RIGEL_GOOGLETEST_DOWNLOAD_URL")
-    endif()
-    if(RIGEL_USE_GOOGLETEST_HEAD)
-      set(rigel_gtest_download_url "https://gitee.com/gottingen/googletest/repository/archive/main.zip")
-    elseif(RIGEL_GOOGLETEST_DOWNLOAD_URL)
-      set(rigel_gtest_download_url ${RIGEL_GOOGLETEST_DOWNLOAD_URL})
-    endif()
-    if(rigel_gtest_download_url)
-      set(rigel_gtest_src_dir ${CMAKE_BINARY_DIR}/googletest-src)
-    else()
-      set(rigel_gtest_src_dir ${RIGEL_LOCAL_GOOGLETEST_DIR})
-    endif()
-    include(CMake/Googletest/DownloadGTest.cmake)
-  endif()
-endif()
-
-set(RIGEL_DYLINK)
-if (APPLE)
-  find_library(CoreFoundation CoreFoundation)
-  list(APPEND RIGEL_DYLINK ${CoreFoundation} pthread)
-elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-  list(APPEND RIGEL_DYLINK rt dl pthread)
-endif ()
-
-find_package(Turbo REQUIRED)
-include_directories(${TURBO_INCLUDE_DIR})
-
-set(DYLIBS
-        ${TURBO_LIBRARIES}
-        )
+include(carbin_module)
 
 add_subdirectory(rigel)
 
-if(RIGEL_ENABLE_INSTALL)
-  # rigel:lts-remove-begin(system installation is supported for LTS releases)
-  # We don't support system-wide installation
-  list(APPEND SYSTEM_INSTALL_DIRS "/usr/local" "/usr" "/opt/" "/opt/local" "c:/Program Files/${PROJECT_NAME}")
-  if(NOT DEFINED CMAKE_INSTALL_PREFIX OR CMAKE_INSTALL_PREFIX IN_LIST SYSTEM_INSTALL_DIRS)
-    message(WARNING "\
-  The default and system-level install directories are unsupported except in LTS \
-  releases of Turbo.  Please set CMAKE_INSTALL_PREFIX to install Turbo in your \
-  source or build tree directly.\
-    ")
-  endif()
-  # rigel:lts-remove-end
+if (CARBIN_BUILD_TEST)
+    add_subdirectory(tests)
+endif ()
 
-  # install as a subdirectory only
-  install(EXPORT ${PROJECT_NAME}Targets
-    NAMESPACE rigel::
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
+if (CARBIN_BUILD_BENCHMARK)
+    add_subdirectory(benchmark)
+endif ()
 
-  configure_package_config_file(
-    CMake/rigelConfig.cmake.in
-    "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
-  install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-  )
+if (CARBIN_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif ()
 
-  # Turbo only has a version in LTS releases.  This mechanism is accomplished
-  # Turbo's internal Copybara (https://github.com/google/copybara) workflows and
-  # isn't visible in the CMake buildsystem itself.
-  if(rigel_VERSION)
-    write_basic_package_version_file(
-      "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-      COMPATIBILITY ExactVersion
-    )
+install(DIRECTORY ${PROJECT_NAME}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING
+        PATTERN "*.inc"
+        PATTERN "*.h"
+        )
 
-    install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-      DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
-    )
-  endif()  # rigel_VERSION
+install(DIRECTORY ${PROJECT_BINARY_DIR}/tedis
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING
+        PATTERN "*.inc"
+        PATTERN "*.h"
+        )
 
-  install(DIRECTORY rigel
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    FILES_MATCHING
-      PATTERN "*.inc"
-      PATTERN "*.h"
-      PATTERN "copts" EXCLUDE
-      PATTERN "testdata" EXCLUDE
-    )
-endif()  # RIGEL_ENABLE_INSTALL
+# Layout. This works for all platforms:
+#   * <prefix>/lib*/cmake/<PROJECT-NAME>
+#   * <prefix>/lib*/
+#   * <prefix>/include/
+set(config_install_dir "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+# Include module with fuction 'write_basic_package_version_file'
+include(CMakePackageConfigHelpers)
+
+# Configure '<PROJECT-NAME>ConfigVersion.cmake'
+# Use:
+#   * PROJECT_VERSION
+write_basic_package_version_file(
+        "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Configure '<PROJECT-NAME>Config.cmake'
+# Use variables:
+#   * TARGETS_EXPORT_NAME
+#   * PROJECT_NAME
+configure_package_config_file(
+        "cmake/package/carbin_config.cmake.in"
+        "${project_config}"
+        INSTALL_DESTINATION "${config_install_dir}"
+)
+
+#Targets:
+#  * <prefix>/lib/libbar.a
+#  * <prefix>/lib/libbaz.a
+#  * header location after install: <prefix>/include/foo/Bar.hpp
+#  * headers can be included by C++ code `#include <foo/Bar.h"`
+
+
+# Config
+#   * <prefix>/lib/cmake/Foo/FooConfig.cmake
+#   * <prefix>/lib/cmake/Foo/FooConfigVersion.cmake
+install(
+        FILES
+        "${project_config}" "${version_config}"
+        DESTINATION
+        "${config_install_dir}"
+)
+
+# Config
+#   * <prefix>/lib/cmake/Foo/FooTargets.cmake
+
+install(
+        EXPORT
+        "${TARGETS_EXPORT_NAME}"
+        NAMESPACE
+        "${namespace}"
+        DESTINATION
+        "${config_install_dir}"
+)

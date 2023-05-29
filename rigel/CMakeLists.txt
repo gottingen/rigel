@@ -1,11 +1,11 @@
 #
-# Copyright 2020 The Turbo Authors.
+# Copyright 2023 The titan-search Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      https://www.apache.org/licenses/LICENSE-2.0
+#    https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,25 +14,16 @@
 # limitations under the License.
 #
 
-set(RIGEL_ALL_SRC
-        "framework/numa_utils.cc"
-        "memory/buffer_attributes.cc"
-        "memory/pinned_memory_manager.cc"
-        "thread/cleanup.cc"
-        )
+file(GLOB_RECURSE TF_H "taskflow/*.h")
 
-rigel_cc_library(
-        NAME
-        rigel
-        SRCS
-        ${RIGEL_ALL_SRC}
+carbin_cc_library(
+        NAMESPACE rigel
+        NAME taskflow
+        HEADERS
+        ${TF_H}
         COPTS
-        ${RIGEL_DEFAULT_COPTS}
+        ${USER_CXX_FLAGS}
         DEPS
-        ${RIGEL_DYLINK}
+        ${CARBIN_DEPS_LINK}
+        PUBLIC
 )
-
-if(RIGEL_BUILD_TESTING)
-    add_subdirectory(memory)
-    #add_subdirectory(workflow)
-endif()

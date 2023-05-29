@@ -1,0 +1,13 @@
+name: rigel-dev
+channels:
+  - conda-forge
+  - defaults
+  - titan-search
+dependencies:
+  - gcc # [linux]
+  - gxx # [linux]
+  - sysroot_linux-64=2.17 # [linux]
+  - turbo
+  - gtest
+  - gmock
+  - benchmark

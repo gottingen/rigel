@@ -1,6 +1,0 @@
-name: rigel-dev
-channels:
-  - conda-forge
-  - mgottingen
-dependencies:
-  - turbo

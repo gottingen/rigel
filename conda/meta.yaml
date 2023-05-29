@@ -3,45 +3,41 @@
 {% set number = GIT_DESCRIBE_NUMBER %}
 
 package:
-  name: rigel-pkg
+  name: changme-pkg
   version: {{ version }}
 
 build:
   number: {{ number }}
 
 about:
-  home: https://github.com/gottingen/rigel
+  home: https://github.com/gottingen/changme
   license: Apache License 2
   license_family: APACHE
   license_file: LICENSE
-  summary: A library for c++ based libraries and rpc libraries
+  summary: A server based on faiss serving for vector search
 
 source:
   git_url: ../
 
 outputs:
-  - name: rigel-rigel
+  - name: changme
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
-      string: "h{{ GIT_DESCRIBE_HASH }}_{{ number }}"
+      #   string: "h{{ PKG_HASH }}_{{ number }}"
       run_exports:
-        - {{ pin_compatible('rigel', exact=True) }}
+        - {{ pin_compatible('changme', exact=True) }}
     requirements:
       build:
-        - clang # [osx]
-        - clangxx #   [osx]
-        - gcc =8.5 # [linux]
-        - gxx =8.5 # [linux]
-        - sysroot_linux-64=2.17 # [linux]
+        - {{ compiler('cxx') }}
+        - sysroot_linux-64 =2.17  # [linux64]
       host:
-        - sysroot_linux-64=2.17 # [linux]
+        - sysroot_linux-64 =2.17  # [linux64]
       run:
-        #- __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.15") }}  # [osx and x86_64]
-        - sysroot_linux-64=2.17 # [linux]
+        - sysroot_linux-64 =2.17  # [linux64]
     test:
       commands:
-        - test -f $PREFIX/lib/librigel_rigel.so              # [linux]
-        - test -f $PREFIX/lib/librigel_rigel.dylib           # [osx]
+        - test -f $PREFIX/lib/libchangme.so              # [linux]
+        - test -f $PREFIX/lib/libchangme.dylib           # [osx]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]
