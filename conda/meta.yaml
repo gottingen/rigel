@@ -3,14 +3,14 @@
 {% set number = GIT_DESCRIBE_NUMBER %}
 
 package:
-  name: changme-pkg
+  name: rigel-pkg
   version: {{ version }}
 
 build:
   number: {{ number }}
 
 about:
-  home: https://github.com/gottingen/changme
+  home: https://github.com/gottingen/rigel
   license: Apache License 2
   license_family: APACHE
   license_file: LICENSE
@@ -20,13 +20,13 @@ source:
   git_url: ../
 
 outputs:
-  - name: changme
+  - name: rigel
     script: bld.sh   # [not win]
     script: bld.bat  # [win]
     build:
       #   string: "h{{ PKG_HASH }}_{{ number }}"
       run_exports:
-        - {{ pin_compatible('changme', exact=True) }}
+        - {{ pin_compatible('rigel', exact=True) }}
     requirements:
       build:
         - {{ compiler('cxx') }}
@@ -37,7 +37,7 @@ outputs:
         - sysroot_linux-64 =2.17  # [linux64]
     test:
       commands:
-        - test -f $PREFIX/lib/libchangme.so              # [linux]
-        - test -f $PREFIX/lib/libchangme.dylib           # [osx]
+        - test -f $PREFIX/lib/librigel.so              # [linux]
+        - test -f $PREFIX/lib/librigel.dylib           # [osx]
       #  - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
       #  - conda inspect objects -p $PREFIX $PKG_NAME   # [osx]
